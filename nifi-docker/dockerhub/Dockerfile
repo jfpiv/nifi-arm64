@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-ARG IMAGE_NAME=openjdk
+ARG IMAGE_NAME=arm64v8/openjdk
 ARG IMAGE_TAG=8-jre
 FROM ${IMAGE_NAME}:${IMAGE_TAG}
 ARG MAINTAINER="Apache NiFi <dev@nifi.apache.org>"
@@ -24,7 +24,7 @@ LABEL site="https://nifi.apache.org"
 
 ARG UID=1000
 ARG GID=1000
-ARG NIFI_VERSION=1.14.0
+ARG NIFI_VERSION=1.13.2
 ARG BASE_URL=https://archive.apache.org/dist
 ARG MIRROR_BASE_URL=${MIRROR_BASE_URL:-${BASE_URL}}
 ARG NIFI_BINARY_PATH=${NIFI_BINARY_PATH:-/nifi/${NIFI_VERSION}/nifi-${NIFI_VERSION}-bin.zip}
@@ -72,6 +72,10 @@ RUN curl -fSL ${MIRROR_BASE_URL}/${NIFI_BINARY_PATH} -o ${NIFI_BASE_DIR}/nifi-${
     && mkdir -p ${NIFI_HOME}/state \
     && mkdir -p ${NIFI_LOG_DIR} \
     && ln -s ${NIFI_HOME} ${NIFI_BASE_DIR}/nifi-${NIFI_VERSION}
+
+# Remove hive because it has old version of snappy-java which doesn't work on aarch64
+RUN rm /opt/nifi/nifi-current/lib/nifi-hive*
+
 
 VOLUME ${NIFI_LOG_DIR} \
        ${NIFI_HOME}/conf \
